@@ -12,7 +12,20 @@ def index():
 def about():
 	return render_template('about.html')
 
-# Create User Page
-@app.route('/user/<name>')
-def user(name):
-	return render_template('user.html', user_name=name)
+# Create Keyword Page
+@app.route('/key_tool')
+def key_tool():
+	return render_template('key_tool.html')
+
+
+#Create Custom Error Code Page
+
+# This Page Doesnt Exist
+@app.errorhandler(404)
+def page_not_found(e):
+	return render_template('404.html'), 404
+
+# Internal Server Error
+@app.errorhandler(500)
+def page_not_found(e):
+	return render_template('500.html'), 500
