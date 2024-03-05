@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+	<h1>Brand Filter Tool</h1>
+    <form method="post">
+        <label for="list1">List of Keyword Phrases:</label><br>
+        <textarea id="list1" name="list1" rows="4" cols="50"></textarea><br>
+        <label for="list2">List of Brands to Check:</label><br>
+        <textarea id="list2" name="list2" rows="2" cols="50"></textarea><br>
+        <input type="submit" value="Check">
+    </form>
+    {% if result %}
+        <h2>Results:</h2>
+        <p>{{ result }}</p>
+    {% endif %}
+
+{% endblock %}

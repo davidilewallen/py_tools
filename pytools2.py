@@ -33,20 +33,20 @@ def page_not_found(e):
 #Brand Filter
 @app.route('/brand_filter', methods=['GET', 'POST'])
 def brand_filter():
-    results = []  # This will store tuples of (keyword, "Brand"/"Non-Brand")
+    result = None
     if request.method == 'POST':
         list1 = request.form['list1'].lower().split('\n')
-        list2 = set(request.form['list2'].lower().split('\n'))  # Convert list2 to set for faster lookups
+        list2 = request.form['list2'].lower().split('\n')
+        found_brands = []
+
         for phrase in list1:
-            # Check if any brand is in the phrase, mark as 'Brand' if found, else 'Non-Brand'
-            match_status = 'Non-Brand'
             for brand in list2:
                 if brand in phrase:
-                    match_status = 'Brand'
-                    break  # Stop searching once a brand is found
-            results.append((phrase, match_status))
+                    found_brands.append(brand)
+        
+        result = "Found Brands: " + ", ".join(set(found_brands)) if found_brands else "No brands found."
 
-    return render_template('brand_filter.html', results=results)
+    return render_template('brand_filter.html', result=result)
 
 if __name__ == '__main__':
     app.run(debug=True)
