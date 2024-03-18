@@ -65,7 +65,7 @@ def brand_filter():
 # Connecting to BigQuery, a form to input the json connect file, and forms to connect to the right dataset and table
 # Directory for storing uploaded credentials
 # Ensure this directory exists and is not publicly accessible
-credentials_dir = '/credentials'
+credentials_dir = '/tmp/credentials'
 os.makedirs(credentials_dir, exist_ok=True)
 
 
