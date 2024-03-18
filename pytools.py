@@ -26,11 +26,6 @@ def index():
 def about():
 	return render_template('about.html')
 
-# Create Keyword Page
-@app.route('/key_tool')
-def key_tool():
-	return render_template('key_tool.html')
-
 
 #Create Custom Error Code Page
 
@@ -64,37 +59,7 @@ def brand_filter():
 
 # Start code for BigQuery Upload Functionality
 
-# Set Google Cloud credentials and project ID
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'semrush-test-417203-50a0755e0493.json'
-client = bigquery.Client()
 
-@app.route('/data_upload')
-def data_upload():
-    return render_template('data_upload.html')
-
-@app.route('/data_upload/uploader', methods=['POST'])
-def data_upload_uploader():
-    if request.method == 'POST':
-        f = request.files['file']
-        df = pd.read_csv(f)
-        
-        # Ensure there's a date column in df, add or convert here if necessary
-
-        # Clean up column names to meet BigQuery requirements
-        df.columns = [re.sub(r'[^a-zA-Z0-9_]', '_', col) for col in df.columns]
-
-        dataset_id = 'semrush_data_one'
-        table_id = 'your_table_id'
-        table_ref = f"{client.project}.{dataset_id}.{table_id}"
-        
-        job_config = bigquery.LoadJobConfig()
-        job_config.write_disposition = bigquery.WriteDisposition.WRITE_APPEND  # Append to the table
-        job_config.autodetect = True  # Auto-detect the schema
-        
-        job = client.load_table_from_dataframe(df, table_ref, job_config=job_config)
-        job.result()  # Wait for the job to complete
-        
-        return 'File uploaded and data appended to BigQuery successfully'
 
 
 # Connecting to BigQuery, a form to input the json connect file, and forms to connect to the right dataset and table
