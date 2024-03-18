@@ -7,14 +7,9 @@ import os
 import re
 from google.cloud import bigquery
 
-
 app = Flask(__name__)
 
-
-
-app.secret_key = 'your_very_secret_key'
-
-#app.secret_key = 'your_secret_key'
+app.secret_key = 'your_secret_key'
 
 # Create Index Page
 @app.route('/')
@@ -103,9 +98,6 @@ def data_upload_uploader():
 credentials_dir = '/credentials'
 os.makedirs(credentials_dir, exist_ok=True)
 
-
-
-
 @app.route('/connect', methods=['GET', 'POST'])
 def connect():
     if request.method == 'POST':
@@ -123,64 +115,40 @@ def connect():
             dataset_id = request.form.get('dataset_id')
             table_id = request.form.get('table_id')
             if dataset_id and table_id:
-                session['dataset_id'] = dataset_id
-                session['table_id'] = table_id
                 try:
                     client = bigquery.Client()
-                    # Fetch the project name from the BigQuery client
-                    session['project_name'] = client.project
                     dataset_ref = client.dataset(dataset_id)
                     table_ref = dataset_ref.table(table_id)
-                    client.get_table(table_ref)  # This will raise NotFound if the table doesn't exist
-                    flash(f'Connected to BigQuery project: \'{client.project}\', Dataset ID: \'{dataset_id}\', and Table: \'{table_id}\'.', 'success')
+                    # Attempt to fetch the table (will raise NotFound if table doesn't exist)
+                    client.get_table(table_ref)
+                    flash(f'Connected to dataset: {dataset_id}, and table ID: {table_id}.', 'success')
                 except Exception as e:
                     flash(f'Error connecting to dataset: {dataset_id}, and table ID: {table_id}. Details: {str(e)}', 'error')
             else:
                 flash('Dataset ID and Table ID must be provided.', 'error')
 
-    # Retrieve connection details from the session for display
-    connection_info = {
-        'project_name': session.get('project_name'),
-        'dataset_id': session.get('dataset_id'),
-        'table_id': session.get('table_id')
-    }
-
-    # Render the connect.html template with the connection_info context
-    return render_template('connect.html', connection_info=connection_info)
+    return render_template('connect.html')
 
 
 #Display the data that we are connected to
 @app.route('/display_data', methods=['POST'])
 def display_data():
-    # Fetch dataset_id and table_id from session
-    dataset_id = session.get('dataset_id')
-    table_id = session.get('table_id')
+    # Assume dataset_id and table_id are globally available or retrieve them appropriately
+    global dataset_id, table_id
+    table_ref = f"{client.project}.{dataset_id}.{table_id}"
 
-    if not dataset_id or not table_id:
-        flash('Dataset ID or Table ID is missing. Please connect first.', 'error')
-        return redirect(url_for('connect'))
+    # Query to select the first 10 rows of the table
+    query = f"SELECT * FROM `{table_ref}` LIMIT 10"
+    query_job = client.query(query)  # Make an API request
 
-    try:
-        # Construct the fully-qualified table reference
-        client = bigquery.Client()
-        table_ref = f"{client.project}.{dataset_id}.{table_id}"
+    # Convert the query result to a pandas DataFrame
+    df = query_job.to_dataframe()
 
-        # Execute the query to fetch the first 10 rows
-        query = f"SELECT * FROM `{table_ref}` LIMIT 10"
-        query_job = client.query(query)  # Make an API request
+    # Convert DataFrame to HTML table for rendering
+    df_html = df.to_html(classes='data', index=False)
 
-        # Convert the query result to a pandas DataFrame
-        df = query_job.to_dataframe()
-
-        # Convert DataFrame to HTML table for rendering
-        df_html = df.to_html(classes='data', index=False)
-        
-        # Render the display_data.html or any template you're using to show the table
-        return render_template('display_data.html', table=df_html)
-
-    except Exception as e:
-        flash(f'Failed to display data: {str(e)}', 'error')
-        return redirect(url_for('connect'))
+    # Pass the HTML table to the template
+    return render_template('display_data.html', table=df_html)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "semrush-test-417203",
+  "private_key_id": "50a0755e049341fa75999cdadb6a99a00e5220df",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQChMVjdxD145U2b\n9wN0oOl8VIY0D3Pke0/hxitb4TvoYV2mI4KUV2skwXowJ6Dttft+UMg/7Yy6x8z1\nmK+xycg1QW7eNP97WuBGyLlNOGp7aEuzZKr0Ojf3HJXL18aeF3Ji7J/0aqG/Zo+O\n2iZjE0kxRVxi3U+wXtU1Q6KTVjcSqLLbMCmwib+NwUiD3ERzAURskDbe56JHg9Xs\n1wADw2NOK5P7YxXFqOtHIp/E+hHGUrL8RPF5EI9/SgPRO+7pHszBFZMyw4IBlH3Q\nsb1iVuQngTvjbpikk4Ln89dQg6c7sadsnOqhGxF9Ku7F5zxxJI5hAGMXOZpYsOiv\nk1caNX7bAgMBAAECggEACtuxdMmHVTbSZ4iC1Gm9JgGQ7hOBvF5iHyn45GjjtDT6\n2KTZDaJl4UVMic826Uxc80FV0UNF5j8XRg6m/H7vMZyFb1/P5etVOETFLA0k1HNO\nG3jTMJMguftUS+BDzNp00MfHw/B6533CezOkFQBzlGdrtcKFX7LDrKGFuLm8s/ug\nUW82kg9mPXWHFM20eOx2zMzhP2FBQspOcD138cQvKCYnCJQa2F43v4tawESiyFJq\nNdljZekH83GCEvk0oMu3Zm2yPp73n3iM4VGuEvm6e0nTAuomkLBxvQn04d94d7fs\n6YiCNRzci19oRqZVgJSB/ghR9DzN5WNkVIC51GEtAQKBgQDjJqu78FJxCShMwZqu\nA1rx2onIrj8eau4awFysgStPPTWKYfHfsPVQzwluFWAVeuOVDHN6edBb94+DjJxw\nwfb1UF/SnybWAtg7fTmj6EU51MekQd0Ddx25W3Rf0mAoX+2Pc1/IpBNMZZpEyoWP\nEHZIEZmq7uT1GSoc6DZsCt1o+wKBgQC1qi8RvvEpbs6wKUaKEUR0NS9KTKgrLN24\nZbLVwhCQTAiQXGk0HtiN/v47S5ZoGQfT7ZlqDF62F8PEvnDQ2DGmS9fPewgrHoDH\n+lPfX3upQlDY/9RMuHVCivggSbJSI2rBNypcCZwf2Y8PiS+kx/A7fjL+j9qrJt1e\nsGpkE2wboQKBgDadHJtCK8ArsHnL7rG58srFfW03n8tjcD4UU/PR1qTllZLg+7OJ\nq2GzdZP3JbPkaQV0Ceu/j/4cpm+9hfuCVysiGPfd9gtsgarD7/Ddro85/ooan9Xu\ndMIVIATN4vqyHb7owXXPJSiwIQg7HSOJlLa9LJIxf/ECDOMIXdVaQ2OzAoGBAKGt\nIlLy0oKDYWOaeHLsRzX9F2dSreAu/+zaZbykCEXDxWNlOyPtx+En7W8sKGHg1Pyh\n2wVsmOYKZGq26oSTxCwyF5FJ980YSpivivGjctUCdh2KIZFeIM3mDEoADLnZV2s6\nA3MCAna+EvpKp6JJZt4rxIqV0JC9+AoLi8QhHPfBAoGAfZiaV2sA63sOJ0M9uRCg\nIXuXqwiqnb7eKrLQ4SEX1KXiXMshN7dQBfWDml+JNBUk2bSsP+6jfg3jXpBps31M\nfLM9SyjBv80jRjlkNOUDnIUU3QjD3jXf7QLS6dfGlsyYvUUw+VwAWcX5xg1Rij6N\nZ8De1xVJMF0cNhJdCsD9tAk=\n-----END PRIVATE KEY-----\n",
+  "client_email": "semrush-test@semrush-test-417203.iam.gserviceaccount.com",
+  "client_id": "108145267421197555582",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/semrush-test%40semrush-test-417203.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
