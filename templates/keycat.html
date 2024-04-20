@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Keyword Categorizer</h1>
+    <form method="post" class="mb-3">
+        <div class="form-row">
+            <div class="col-md-4">
+                <label for="keywords">Keywords:</label>
+                <textarea name="keywords" id="keywords" class="form-control" placeholder="Enter keywords..." style="height: 50vh;"></textarea>
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="brand_terms_1">Brand Terms Set 1:</label>
+                        <textarea name="brand_terms_1" id="brand_terms_1" class="form-control" placeholder="Brand terms set 1..." rows="3"></textarea>
+                        <label for="brand_match_threshold_1">Brand Match Threshold 1:</label>
+                        <input type="number" name="brand_match_threshold_1" id="brand_match_threshold_1" class="form-control" value="80">
+                        <label for="main_brand_term_1">Main Brand Term 1:</label>
+                        <input type="text" name="main_brand_term_1" id="main_brand_term_1" class="form-control" placeholder="Main brand term 1">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="brand_terms_2">Brand Terms Set 2:</label>
+                        <textarea name="brand_terms_2" id="brand_terms_2" class="form-control" placeholder="Brand terms set 2..." rows="3"></textarea>
+                        <label for="brand_match_threshold_2">Brand Match Threshold 2:</label>
+                        <input type="number" name="brand_match_threshold_2" id="brand_match_threshold_2" class="form-control" value="80">
+                        <label for="main_brand_term_2">Main Brand Term 2:</label>
+                        <input type="text" name="main_brand_term_2" id="main_brand_term_2" class="form-control" placeholder="Main brand term 2">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="category_terms">Category Terms:</label>
+                        <textarea name="category_terms" id="category_terms" class="form-control" placeholder="Category terms..." rows="3"></textarea>
+                        <label for="category_match_threshold">Category Match Threshold:</label>
+                        <input type="number" name="category_match_threshold" id="category_match_threshold" class="form-control" value="80">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Categorize</button>
+    </form>
+
+    {% if results %}
+    <h2>Results</h2>
+    <button onclick="copyToClipboard()" class="btn btn-info">Copy to Clipboard</button>
+    <table id="resultsTable" class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <th>Keyword</th>
+                <th>Brand/Non-Brand</th>
+                <th>Matched Brand/SKU</th>
+                <th>Matched Categories</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.keyword }}</td>
+                <td>{{ result.brand_category }}</td>
+                <td>{{ result.matched_brand_term }}</td>
+                <td>{{ result.matched_category_terms }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% endif %}
+</div>
+<script>
+function copyToClipboard() {
+    var range = document.createRange();
+    range.selectNode(document.getElementById('resultsTable'));
+    window.getSelection().removeAllRanges(); // clear current selection
+    window.getSelection().addRange(range); // to select text
+    document.execCommand("copy");
+    window.getSelection().removeAllRanges();// to deselect
+    alert('Results copied to clipboard.');
+}
+</script>
+{% endblock %}

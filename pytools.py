@@ -14,7 +14,19 @@ app = Flask(__name__)
 
 app.secret_key = 'your_very_secret_key'
 
+# Folder to temporarily store uploaded files
+UPLOAD_FOLDER = 'uploads'
+ALLOWED_EXTENSIONS = {'csv'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Limit uploads to 16MB
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 #app.secret_key = 'your_secret_key'
+
 
 # Create Index Page
 @app.route('/')
@@ -146,6 +158,152 @@ def display_data():
     except Exception as e:
         flash(f'Failed to display data: {str(e)}', 'error')
         return redirect(url_for('connect'))
+
+
+@app.route('/upload-csv', methods=['GET', 'POST'])
+def upload_csv():
+    if request.method == 'POST':
+        # Check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(filepath)
+            # Now that we have the file, let's append it to the BigQuery table
+            try:
+                append_csv_to_bigquery(filepath)
+                flash('File successfully uploaded and appended to BigQuery table.')
+            except Exception as e:
+                flash(f'An error occurred: {e}')
+            finally:
+                os.remove(filepath)  # Clean up the uploaded file
+            return redirect(url_for('upload_csv'))
+    return '''
+    <!doctype html>
+    <title>Upload new CSV</title>
+    <h1>Upload new CSV to append to BigQuery</h1>
+    <form method=post enctype=multipart/form-data>
+      <input type=file name=file>
+      <input type=submit value=Upload>
+    </form>
+    '''
+#new keyword categorizer
+@app.route('/keycat', methods=['GET', 'POST'])
+def categorize_keywords():
+    if request.method == 'POST':
+        keywords = request.form['keywords'].strip().split('\n')
+        brand_terms_1 = request.form['brand_terms_1'].strip().split('\n')
+        main_brand_term_1 = request.form['main_brand_term_1'].strip()
+        brand_terms_2 = request.form['brand_terms_2'].strip().split('\n')
+        main_brand_term_2 = request.form['main_brand_term_2'].strip()
+        category_terms = request.form['category_terms'].strip().split('\n')
+        brand_match_threshold_1 = int(request.form['brand_match_threshold_1'])
+        brand_match_threshold_2 = int(request.form['brand_match_threshold_2'])
+        category_match_threshold = int(request.form['category_match_threshold'])
+
+        results = []
+        for keyword in keywords:
+            result = analyze_keyword(keyword, brand_terms_1, main_brand_term_1, brand_terms_2, main_brand_term_2, category_terms, brand_match_threshold_1, brand_match_threshold_2, category_match_threshold)
+            results.append(result)
+
+        return render_template('keycat.html', results=results)
+    else:
+        return render_template('keycat.html')
+
+def analyze_keyword(keyword, brand_terms_1, main_brand_term_1, brand_terms_2, main_brand_term_2, category_terms, threshold1, threshold2, category_threshold):
+    result = {
+        'keyword': keyword,
+        'brand_category': 'non-brand',
+        'matched_brand_term': 'N/A',
+        'matched_category_terms': []
+    }
+    
+    if is_address_like(keyword):
+        result['brand_category'] = 'brand'
+        result['matched_brand_term'] = 'address'
+    elif is_phone_number_like(keyword):
+        result['brand_category'] = 'brand'
+        result['matched_brand_term'] = 'phone number'
+    elif is_sku_like(keyword):
+        result['brand_category'] = 'brand'
+        result['matched_brand_term'] = 'SKU'
+    else:
+        # Check against fuzzy match criteria
+        if find_fuzzy_match(keyword, brand_terms_1, threshold1):
+            result['brand_category'] = 'brand'
+            result['matched_brand_term'] = main_brand_term_1
+        elif find_fuzzy_match(keyword, brand_terms_2, threshold2):
+            result['brand_category'] = 'brand'
+            result['matched_brand_term'] = main_brand_term_2
+
+    # Determine category matches
+    matched_categories = [term for term in category_terms if find_fuzzy_match(keyword, [term], category_threshold)]
+    if matched_categories:
+        result['matched_category_terms'] = ', '.join(matched_categories)
+
+    return result
+
+
+
+def is_phone_number_like(keyword):
+    # Use bool to ensure the return type is explicitly boolean
+    return bool(re.search(r'\b(\(\d{3}\) |\d{3}-)\d{3}-\d{4}\b', keyword))
+
+def is_address_like(keyword):
+    # Use bool to ensure the return type is explicitly boolean
+    return bool(re.search(r'\d+\s+\w+\s+(street|st|avenue|ave|road|rd|boulevard|blvd|drive|dr|lane|ln)\b', keyword, re.IGNORECASE))
+
+def is_sku_like(keyword):
+    # Already returns a boolean value
+    return any(re.search('[a-zA-Z]', segment) and re.search('[0-9]', segment) for segment in re.findall(r'\b[a-zA-Z0-9]{4,14}\b', keyword))
+
+
+def find_fuzzy_match(keyword, terms, match_threshold):
+    best_match, score = process.extractOne(keyword, terms)
+    return score >= match_threshold
+
+def analyze_keyword(keyword, brand_terms_1, main_brand_term_1, brand_terms_2, main_brand_term_2, category_terms, threshold1, threshold2, category_threshold):
+    result = {
+        'keyword': keyword,
+        'brand_category': 'non-brand',
+        'matched_brand_term': 'N/A',
+        'matched_category_terms': []
+    }
+    
+    # Always check for addresses, phone numbers, and SKUs
+    if is_address_like(keyword):
+        result['brand_category'] = 'brand'
+        result['matched_brand_term'] = 'address'
+    elif is_phone_number_like(keyword):
+        result['brand_category'] = 'brand'
+        result['matched_brand_term'] = 'phone number'
+    elif is_sku_like(keyword):
+        result['brand_category'] = 'brand'
+        result['matched_brand_term'] = 'SKU'
+    else:
+        # Continue with fuzzy matching for brands
+        if find_fuzzy_match(keyword, brand_terms_1, threshold1):
+            result['brand_category'] = 'brand'
+            result['matched_brand_term'] = main_brand_term_1
+        elif find_fuzzy_match(keyword, brand_terms_2, threshold2):
+            result['brand_category'] = 'brand'
+            result['matched_brand_term'] = main_brand_term_2
+
+    # Check category matches using fuzzy matching
+    matched_categories = [term for term in category_terms if find_fuzzy_match(keyword, [term], category_threshold)]
+    if matched_categories:
+        result['matched_category_terms'] = ', '.join(matched_categories)
+
+    return result
+
 
 
 if __name__ == '__main__':
